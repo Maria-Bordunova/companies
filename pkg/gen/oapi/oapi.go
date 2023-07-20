@@ -86,14 +86,14 @@ type Error struct {
 // ErrorCode Error code
 type ErrorCode string
 
-// ParamCompanyId defines model for paramCompanyId.
-type ParamCompanyId = string
+// ParamCompanyUId defines model for paramCompanyUId.
+type ParamCompanyUId = string
 
 // PostCompaniesJSONRequestBody defines body for PostCompanies for application/json ContentType.
 type PostCompaniesJSONRequestBody = CompanyInput
 
-// PatchCompaniesCompanyIdJSONRequestBody defines body for PatchCompaniesCompanyId for application/json ContentType.
-type PatchCompaniesCompanyIdJSONRequestBody = CompanyUpdate
+// PatchCompaniesUidJSONRequestBody defines body for PatchCompaniesUid for application/json ContentType.
+type PatchCompaniesUidJSONRequestBody = CompanyUpdate
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -173,16 +173,16 @@ type ClientInterface interface {
 
 	PostCompanies(ctx context.Context, body PostCompaniesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteCompaniesCompanyId request
-	DeleteCompaniesCompanyId(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteCompaniesUid request
+	DeleteCompaniesUid(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetCompaniesCompanyId request
-	GetCompaniesCompanyId(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetCompaniesUid request
+	GetCompaniesUid(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PatchCompaniesCompanyId request with any body
-	PatchCompaniesCompanyIdWithBody(ctx context.Context, companyId ParamCompanyId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PatchCompaniesUid request with any body
+	PatchCompaniesUidWithBody(ctx context.Context, uid ParamCompanyUId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PatchCompaniesCompanyId(ctx context.Context, companyId ParamCompanyId, body PatchCompaniesCompanyIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PatchCompaniesUid(ctx context.Context, uid ParamCompanyUId, body PatchCompaniesUidJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) PostCompaniesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -209,8 +209,8 @@ func (c *Client) PostCompanies(ctx context.Context, body PostCompaniesJSONReques
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteCompaniesCompanyId(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteCompaniesCompanyIdRequest(c.Server, companyId)
+func (c *Client) DeleteCompaniesUid(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteCompaniesUidRequest(c.Server, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -221,8 +221,8 @@ func (c *Client) DeleteCompaniesCompanyId(ctx context.Context, companyId ParamCo
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetCompaniesCompanyId(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCompaniesCompanyIdRequest(c.Server, companyId)
+func (c *Client) GetCompaniesUid(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetCompaniesUidRequest(c.Server, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -233,8 +233,8 @@ func (c *Client) GetCompaniesCompanyId(ctx context.Context, companyId ParamCompa
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchCompaniesCompanyIdWithBody(ctx context.Context, companyId ParamCompanyId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchCompaniesCompanyIdRequestWithBody(c.Server, companyId, contentType, body)
+func (c *Client) PatchCompaniesUidWithBody(ctx context.Context, uid ParamCompanyUId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchCompaniesUidRequestWithBody(c.Server, uid, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -245,8 +245,8 @@ func (c *Client) PatchCompaniesCompanyIdWithBody(ctx context.Context, companyId 
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchCompaniesCompanyId(ctx context.Context, companyId ParamCompanyId, body PatchCompaniesCompanyIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchCompaniesCompanyIdRequest(c.Server, companyId, body)
+func (c *Client) PatchCompaniesUid(ctx context.Context, uid ParamCompanyUId, body PatchCompaniesUidJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchCompaniesUidRequest(c.Server, uid, body)
 	if err != nil {
 		return nil, err
 	}
@@ -297,13 +297,13 @@ func NewPostCompaniesRequestWithBody(server string, contentType string, body io.
 	return req, nil
 }
 
-// NewDeleteCompaniesCompanyIdRequest generates requests for DeleteCompaniesCompanyId
-func NewDeleteCompaniesCompanyIdRequest(server string, companyId ParamCompanyId) (*http.Request, error) {
+// NewDeleteCompaniesUidRequest generates requests for DeleteCompaniesUid
+func NewDeleteCompaniesUidRequest(server string, uid ParamCompanyUId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "companyId", runtime.ParamLocationPath, companyId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uid", runtime.ParamLocationPath, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -331,13 +331,13 @@ func NewDeleteCompaniesCompanyIdRequest(server string, companyId ParamCompanyId)
 	return req, nil
 }
 
-// NewGetCompaniesCompanyIdRequest generates requests for GetCompaniesCompanyId
-func NewGetCompaniesCompanyIdRequest(server string, companyId ParamCompanyId) (*http.Request, error) {
+// NewGetCompaniesUidRequest generates requests for GetCompaniesUid
+func NewGetCompaniesUidRequest(server string, uid ParamCompanyUId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "companyId", runtime.ParamLocationPath, companyId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uid", runtime.ParamLocationPath, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -365,24 +365,24 @@ func NewGetCompaniesCompanyIdRequest(server string, companyId ParamCompanyId) (*
 	return req, nil
 }
 
-// NewPatchCompaniesCompanyIdRequest calls the generic PatchCompaniesCompanyId builder with application/json body
-func NewPatchCompaniesCompanyIdRequest(server string, companyId ParamCompanyId, body PatchCompaniesCompanyIdJSONRequestBody) (*http.Request, error) {
+// NewPatchCompaniesUidRequest calls the generic PatchCompaniesUid builder with application/json body
+func NewPatchCompaniesUidRequest(server string, uid ParamCompanyUId, body PatchCompaniesUidJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPatchCompaniesCompanyIdRequestWithBody(server, companyId, "application/json", bodyReader)
+	return NewPatchCompaniesUidRequestWithBody(server, uid, "application/json", bodyReader)
 }
 
-// NewPatchCompaniesCompanyIdRequestWithBody generates requests for PatchCompaniesCompanyId with any type of body
-func NewPatchCompaniesCompanyIdRequestWithBody(server string, companyId ParamCompanyId, contentType string, body io.Reader) (*http.Request, error) {
+// NewPatchCompaniesUidRequestWithBody generates requests for PatchCompaniesUid with any type of body
+func NewPatchCompaniesUidRequestWithBody(server string, uid ParamCompanyUId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "companyId", runtime.ParamLocationPath, companyId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uid", runtime.ParamLocationPath, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -460,16 +460,16 @@ type ClientWithResponsesInterface interface {
 
 	PostCompaniesWithResponse(ctx context.Context, body PostCompaniesJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCompaniesResponse, error)
 
-	// DeleteCompaniesCompanyId request
-	DeleteCompaniesCompanyIdWithResponse(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*DeleteCompaniesCompanyIdResponse, error)
+	// DeleteCompaniesUid request
+	DeleteCompaniesUidWithResponse(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*DeleteCompaniesUidResponse, error)
 
-	// GetCompaniesCompanyId request
-	GetCompaniesCompanyIdWithResponse(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*GetCompaniesCompanyIdResponse, error)
+	// GetCompaniesUid request
+	GetCompaniesUidWithResponse(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*GetCompaniesUidResponse, error)
 
-	// PatchCompaniesCompanyId request with any body
-	PatchCompaniesCompanyIdWithBodyWithResponse(ctx context.Context, companyId ParamCompanyId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCompaniesCompanyIdResponse, error)
+	// PatchCompaniesUid request with any body
+	PatchCompaniesUidWithBodyWithResponse(ctx context.Context, uid ParamCompanyUId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCompaniesUidResponse, error)
 
-	PatchCompaniesCompanyIdWithResponse(ctx context.Context, companyId ParamCompanyId, body PatchCompaniesCompanyIdJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCompaniesCompanyIdResponse, error)
+	PatchCompaniesUidWithResponse(ctx context.Context, uid ParamCompanyUId, body PatchCompaniesUidJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCompaniesUidResponse, error)
 }
 
 type PostCompaniesResponse struct {
@@ -497,7 +497,7 @@ func (r PostCompaniesResponse) StatusCode() int {
 	return 0
 }
 
-type DeleteCompaniesCompanyIdResponse struct {
+type DeleteCompaniesUidResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON401      *Error
@@ -506,7 +506,7 @@ type DeleteCompaniesCompanyIdResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteCompaniesCompanyIdResponse) Status() string {
+func (r DeleteCompaniesUidResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -514,14 +514,14 @@ func (r DeleteCompaniesCompanyIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteCompaniesCompanyIdResponse) StatusCode() int {
+func (r DeleteCompaniesUidResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetCompaniesCompanyIdResponse struct {
+type GetCompaniesUidResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Company
@@ -530,7 +530,7 @@ type GetCompaniesCompanyIdResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetCompaniesCompanyIdResponse) Status() string {
+func (r GetCompaniesUidResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -538,14 +538,14 @@ func (r GetCompaniesCompanyIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetCompaniesCompanyIdResponse) StatusCode() int {
+func (r GetCompaniesUidResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PatchCompaniesCompanyIdResponse struct {
+type PatchCompaniesUidResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Company
@@ -556,7 +556,7 @@ type PatchCompaniesCompanyIdResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r PatchCompaniesCompanyIdResponse) Status() string {
+func (r PatchCompaniesUidResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -564,7 +564,7 @@ func (r PatchCompaniesCompanyIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PatchCompaniesCompanyIdResponse) StatusCode() int {
+func (r PatchCompaniesUidResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -588,39 +588,39 @@ func (c *ClientWithResponses) PostCompaniesWithResponse(ctx context.Context, bod
 	return ParsePostCompaniesResponse(rsp)
 }
 
-// DeleteCompaniesCompanyIdWithResponse request returning *DeleteCompaniesCompanyIdResponse
-func (c *ClientWithResponses) DeleteCompaniesCompanyIdWithResponse(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*DeleteCompaniesCompanyIdResponse, error) {
-	rsp, err := c.DeleteCompaniesCompanyId(ctx, companyId, reqEditors...)
+// DeleteCompaniesUidWithResponse request returning *DeleteCompaniesUidResponse
+func (c *ClientWithResponses) DeleteCompaniesUidWithResponse(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*DeleteCompaniesUidResponse, error) {
+	rsp, err := c.DeleteCompaniesUid(ctx, uid, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseDeleteCompaniesCompanyIdResponse(rsp)
+	return ParseDeleteCompaniesUidResponse(rsp)
 }
 
-// GetCompaniesCompanyIdWithResponse request returning *GetCompaniesCompanyIdResponse
-func (c *ClientWithResponses) GetCompaniesCompanyIdWithResponse(ctx context.Context, companyId ParamCompanyId, reqEditors ...RequestEditorFn) (*GetCompaniesCompanyIdResponse, error) {
-	rsp, err := c.GetCompaniesCompanyId(ctx, companyId, reqEditors...)
+// GetCompaniesUidWithResponse request returning *GetCompaniesUidResponse
+func (c *ClientWithResponses) GetCompaniesUidWithResponse(ctx context.Context, uid ParamCompanyUId, reqEditors ...RequestEditorFn) (*GetCompaniesUidResponse, error) {
+	rsp, err := c.GetCompaniesUid(ctx, uid, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetCompaniesCompanyIdResponse(rsp)
+	return ParseGetCompaniesUidResponse(rsp)
 }
 
-// PatchCompaniesCompanyIdWithBodyWithResponse request with arbitrary body returning *PatchCompaniesCompanyIdResponse
-func (c *ClientWithResponses) PatchCompaniesCompanyIdWithBodyWithResponse(ctx context.Context, companyId ParamCompanyId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCompaniesCompanyIdResponse, error) {
-	rsp, err := c.PatchCompaniesCompanyIdWithBody(ctx, companyId, contentType, body, reqEditors...)
+// PatchCompaniesUidWithBodyWithResponse request with arbitrary body returning *PatchCompaniesUidResponse
+func (c *ClientWithResponses) PatchCompaniesUidWithBodyWithResponse(ctx context.Context, uid ParamCompanyUId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCompaniesUidResponse, error) {
+	rsp, err := c.PatchCompaniesUidWithBody(ctx, uid, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePatchCompaniesCompanyIdResponse(rsp)
+	return ParsePatchCompaniesUidResponse(rsp)
 }
 
-func (c *ClientWithResponses) PatchCompaniesCompanyIdWithResponse(ctx context.Context, companyId ParamCompanyId, body PatchCompaniesCompanyIdJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCompaniesCompanyIdResponse, error) {
-	rsp, err := c.PatchCompaniesCompanyId(ctx, companyId, body, reqEditors...)
+func (c *ClientWithResponses) PatchCompaniesUidWithResponse(ctx context.Context, uid ParamCompanyUId, body PatchCompaniesUidJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCompaniesUidResponse, error) {
+	rsp, err := c.PatchCompaniesUid(ctx, uid, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePatchCompaniesCompanyIdResponse(rsp)
+	return ParsePatchCompaniesUidResponse(rsp)
 }
 
 // ParsePostCompaniesResponse parses an HTTP response from a PostCompaniesWithResponse call
@@ -670,15 +670,15 @@ func ParsePostCompaniesResponse(rsp *http.Response) (*PostCompaniesResponse, err
 	return response, nil
 }
 
-// ParseDeleteCompaniesCompanyIdResponse parses an HTTP response from a DeleteCompaniesCompanyIdWithResponse call
-func ParseDeleteCompaniesCompanyIdResponse(rsp *http.Response) (*DeleteCompaniesCompanyIdResponse, error) {
+// ParseDeleteCompaniesUidResponse parses an HTTP response from a DeleteCompaniesUidWithResponse call
+func ParseDeleteCompaniesUidResponse(rsp *http.Response) (*DeleteCompaniesUidResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteCompaniesCompanyIdResponse{
+	response := &DeleteCompaniesUidResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -710,15 +710,15 @@ func ParseDeleteCompaniesCompanyIdResponse(rsp *http.Response) (*DeleteCompanies
 	return response, nil
 }
 
-// ParseGetCompaniesCompanyIdResponse parses an HTTP response from a GetCompaniesCompanyIdWithResponse call
-func ParseGetCompaniesCompanyIdResponse(rsp *http.Response) (*GetCompaniesCompanyIdResponse, error) {
+// ParseGetCompaniesUidResponse parses an HTTP response from a GetCompaniesUidWithResponse call
+func ParseGetCompaniesUidResponse(rsp *http.Response) (*GetCompaniesUidResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetCompaniesCompanyIdResponse{
+	response := &GetCompaniesUidResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -750,15 +750,15 @@ func ParseGetCompaniesCompanyIdResponse(rsp *http.Response) (*GetCompaniesCompan
 	return response, nil
 }
 
-// ParsePatchCompaniesCompanyIdResponse parses an HTTP response from a PatchCompaniesCompanyIdWithResponse call
-func ParsePatchCompaniesCompanyIdResponse(rsp *http.Response) (*PatchCompaniesCompanyIdResponse, error) {
+// ParsePatchCompaniesUidResponse parses an HTTP response from a PatchCompaniesUidWithResponse call
+func ParsePatchCompaniesUidResponse(rsp *http.Response) (*PatchCompaniesUidResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PatchCompaniesCompanyIdResponse{
+	response := &PatchCompaniesUidResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -810,14 +810,14 @@ type ServerInterface interface {
 	// (POST /companies)
 	PostCompanies(ctx echo.Context) error
 	// Delete a company
-	// (DELETE /companies/{companyId})
-	DeleteCompaniesCompanyId(ctx echo.Context, companyId ParamCompanyId) error
+	// (DELETE /companies/{uid})
+	DeleteCompaniesUid(ctx echo.Context, uid ParamCompanyUId) error
 	// Get details of a company
-	// (GET /companies/{companyId})
-	GetCompaniesCompanyId(ctx echo.Context, companyId ParamCompanyId) error
+	// (GET /companies/{uid})
+	GetCompaniesUid(ctx echo.Context, uid ParamCompanyUId) error
 	// Update a company partially
-	// (PATCH /companies/{companyId})
-	PatchCompaniesCompanyId(ctx echo.Context, companyId ParamCompanyId) error
+	// (PATCH /companies/{uid})
+	PatchCompaniesUid(ctx echo.Context, uid ParamCompanyUId) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -834,51 +834,51 @@ func (w *ServerInterfaceWrapper) PostCompanies(ctx echo.Context) error {
 	return err
 }
 
-// DeleteCompaniesCompanyId converts echo context to params.
-func (w *ServerInterfaceWrapper) DeleteCompaniesCompanyId(ctx echo.Context) error {
+// DeleteCompaniesUid converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteCompaniesUid(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "companyId" -------------
-	var companyId ParamCompanyId
+	// ------------- Path parameter "uid" -------------
+	var uid ParamCompanyUId
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "companyId", runtime.ParamLocationPath, ctx.Param("companyId"), &companyId)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "uid", runtime.ParamLocationPath, ctx.Param("uid"), &uid)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter companyId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter uid: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.DeleteCompaniesCompanyId(ctx, companyId)
+	err = w.Handler.DeleteCompaniesUid(ctx, uid)
 	return err
 }
 
-// GetCompaniesCompanyId converts echo context to params.
-func (w *ServerInterfaceWrapper) GetCompaniesCompanyId(ctx echo.Context) error {
+// GetCompaniesUid converts echo context to params.
+func (w *ServerInterfaceWrapper) GetCompaniesUid(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "companyId" -------------
-	var companyId ParamCompanyId
+	// ------------- Path parameter "uid" -------------
+	var uid ParamCompanyUId
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "companyId", runtime.ParamLocationPath, ctx.Param("companyId"), &companyId)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "uid", runtime.ParamLocationPath, ctx.Param("uid"), &uid)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter companyId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter uid: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetCompaniesCompanyId(ctx, companyId)
+	err = w.Handler.GetCompaniesUid(ctx, uid)
 	return err
 }
 
-// PatchCompaniesCompanyId converts echo context to params.
-func (w *ServerInterfaceWrapper) PatchCompaniesCompanyId(ctx echo.Context) error {
+// PatchCompaniesUid converts echo context to params.
+func (w *ServerInterfaceWrapper) PatchCompaniesUid(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "companyId" -------------
-	var companyId ParamCompanyId
+	// ------------- Path parameter "uid" -------------
+	var uid ParamCompanyUId
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "companyId", runtime.ParamLocationPath, ctx.Param("companyId"), &companyId)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "uid", runtime.ParamLocationPath, ctx.Param("uid"), &uid)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter companyId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter uid: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.PatchCompaniesCompanyId(ctx, companyId)
+	err = w.Handler.PatchCompaniesUid(ctx, uid)
 	return err
 }
 
@@ -911,31 +911,31 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/companies", wrapper.PostCompanies)
-	router.DELETE(baseURL+"/companies/:companyId", wrapper.DeleteCompaniesCompanyId)
-	router.GET(baseURL+"/companies/:companyId", wrapper.GetCompaniesCompanyId)
-	router.PATCH(baseURL+"/companies/:companyId", wrapper.PatchCompaniesCompanyId)
+	router.DELETE(baseURL+"/companies/:uid", wrapper.DeleteCompaniesUid)
+	router.GET(baseURL+"/companies/:uid", wrapper.GetCompaniesUid)
+	router.PATCH(baseURL+"/companies/:uid", wrapper.PatchCompaniesUid)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xWUW/bNhD+K8Rtj0pMN3K66W3NiqLAgOWlT0EQMNLJZiHxOPLk1TP03weSsmXHKpaH",
-	"xNvQPoo63n333Xd33EJJrSWDhj0UW7DKqRYZ3fh1Q61VZvOxCicV+tJpy5oMFDD8El2nK8gAv6jWNggF",
-	"LBYSf8qlvMA3Pz9e5PMqv1Bv59cXeX59vVjkuZRSQgY6OLGKV5CBUW24We6jZeDwj047rKBg12EGvlxh",
-	"qwIM3thg7Nlps4S+73c/I+wBVszAkUXHGv0J+i206stvaJa8guJKSpk9dZsBtrahDU7chl9a6gwLqsVo",
-	"lEFNrlUMBWjD1znsXWrDuEQXfOpI5N5w4O4kdOLjCOR8MWHncKk9Y6RpT8wjUYPKhP/pZAtouhaKOyjJ",
-	"WXIqZBEAGzK3jmrNkEFJgSzFeo2QgacGbx1Zp5HJ+ZW2cH8Svz+s0h3EVCLyQ+6OQA4uRlf0+BlLDlB3",
-	"SjO24wBZNc3vNRR3W/jRYQ0F/DAb1TobCj7bVbu/P1Dg9rB081DbQPtzdTlo8X3yJm7I2eMkBkEOGRxR",
-	"2o+JfLKVYnxpGZ4q6n8jlZOKv3eO3ClBJVV42nHRWMR/2R7jWjW6ihAfMDrLdiPkwRA/1NSZagJMBrgL",
-	"PRWkRe/VEuGf9D6GrKYkHcy1qek0DK9QeHRrXaKwjta6Qi/QVJa0YS/qmGhIQ8f+Yc3NOB3T2RqdT87m",
-	"l/JShpzIolFWQwFXl/LyCrI4XCOls/FqoJt87LChiGTCdIdb8nxzECFkip7fUbVJVTGMJnWmtY0u483Z",
-	"Z59kPE7nZ3Rr6vH+mM/QVPHAWzI+IX0j5y8dO4Wd3mSlQ8VYCd+VJXpfd02zCczmUr4YjCT6CRDvVCUG",
-	"zlPM+evH/GRUxyty+i+sQtDFORL9aBidUU1sAXQCB8MMfNe2ym1CRWIlhBIG/xx6YRNNRiXPtvvXQp9a",
-	"rME0b491/Ws83yv75uCJcfje+cqeGU1mT95DYeM8EWv+9UdSQjclrX+hzHlC+rpBd5kbYpEG8X9JYEkV",
-	"Qo3iymCJE2PxA/JZtCPPOegqZKUbLxyy07ie1OU3L5EPyHuiqD6WilVcriZ2aDh+Lbm82joeXqrP2sdn",
-	"lWkXgX3D+/h7F0IS59h9wirHWkUlRMt4NXVV5xooYMVsi9msoVI1K/JcvJ0vJPT3/d8BAAD//x0fOdPv",
-	"EAAA",
+	"H4sIAAAAAAAC/+xWUW/jNgz+Kwa3R7dRrk5v89uuOxwKDFhf+lQUhWrRiQ62qEl0dlng/z5IcuOk8WF9",
+	"aLoNd4+WKfLjx4+ktlBRa8mgYQ/lFqx0skVGN35dUWul2dxeq3Ck0FdOW9ZkoIThX9ZpBTngF9naBqGE",
+	"xULgT4UQZ/ju58ezYq6KM/l+fnlWFJeXi0VRCCEE5KCDDyt5BTkY2YabyZPDPzrtUEHJrsMcfLXCVob4",
+	"vLHBzLPTZgl93z/9jIAHPBG7I4uONfoj2Fto5Zff0Cx5BeWFECJ/7jYHbG1DG5y4Db+01BnOqM5Goxxq",
+	"cq1kKEEbvixg51IbxiW64FNHBneGXcr1KHRi4gDkfDFh53CpPWOkaUfMI1GD0oT/6WQLaLoWyjuoyFly",
+	"MmQRABsyN45qzZBDRYEsyXqNkIOnBm8cWaeRyfmVtnB/FL/fr9IdxFQi8n3uDkAOLkZX9PgZKw5Qh7pd",
+	"G9txgCyb5vcayrst/OiwhhJ+mI06nQ0Fnz1Vu7/f0952v3TzUNtA+0sVOajwY/KWXZGzh0kMghwyOKC0",
+	"HxO5tUoyvrYMjxX1v5HKUcU/OkfumKCKFB53XDTO4r98h3EtG60ixAeMzvI4y6TZPBjih5o6oybA5IBP",
+	"oaeCtOi9XCL8k97HkGpK0sFcm5qOw/AKM49urSvMrKO1VugzNMqSNuyzOiYa0tCxf1hzk5Q2nq3R+eRs",
+	"fi7ORciJLBppNZRwcS7OLyCPYzVSOhuvBrrJxw4bikgmjHW4Ic9XexFCpuj5A6lNqophNKkzrW10FW/O",
+	"Pvsk43E6v6BbU4/3h3yGpooH3pLxCek7MX/t2Cns9AqrHEpGlfmuqtD7umuaTWC2EOLVYCTRT4D4IFU2",
+	"cJ5izk8f89bIjlfk9F+oQtDFWyR6bRidkU1sAXQZDoY5+K5tpduEisRKZDIz+OfQC5toMip5tu206lNz",
+	"NZgm7aGif43nO03fxv20/7r5ym4ZTWbPXz9hzTxTaPH1J1ECNqWnf6G2RUJ62qBPmRviLE3f/5KqkiAy",
+	"OSoqhyVOzMJPyKeWjXjLwaaQpW585pCdxvWkJL95dXxC3hFF9aFKrORqNbEzw/EJlHKyzTs8Sl+0et9U",
+	"oV0E9g2v3u8NCEmcY+NlVjrWMiohWsarqa0610AJK2ZbzmYNVbJZkefy/XwhoL/v/w4AAP//ZXJAbtQQ",
+	"AAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

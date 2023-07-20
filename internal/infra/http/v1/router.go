@@ -1,7 +1,7 @@
 package v1
 
 import (
-	controller "companies/internal/infra/http/v1/handler"
+	controller "companies/internal/infra/http/v1/controller"
 	"companies/internal/infra/http/v1/middleware"
 	"github.com/gorilla/mux"
 
@@ -16,10 +16,10 @@ func NewRouter(c controller.Controller, mr *middleware.Registry) http.Handler {
 		mr.AuthByJwt(),
 	)
 
-	router.HandleFunc("/companies/{companyId}", c.HandleCompanyGetById).Methods(http.MethodGet)
-	routerAuth.HandleFunc("/companies/{companyId}", c.HandleCompanyCreate).Methods(http.MethodPost)
-	routerAuth.HandleFunc("/companies/{companyId}", c.HandleCompanyUpdateById).Methods(http.MethodPatch)
-	routerAuth.HandleFunc("/companies/{companyId}", c.HandleCompanyDeleteById).Methods(http.MethodDelete)
+	routerAuth.HandleFunc("/companies", c.HandleCompanyCreate).Methods(http.MethodPost)
+	router.HandleFunc("/companies/{uid}", c.HandleCompanyGetById).Methods(http.MethodGet)
+	routerAuth.HandleFunc("/companies/{uid}", c.HandleCompanyUpdateById).Methods(http.MethodPatch)
+	routerAuth.HandleFunc("/companies/{uid}", c.HandleCompanyDeleteById).Methods(http.MethodDelete)
 
 	return router
 }

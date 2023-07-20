@@ -7,6 +7,7 @@ require (
 	github.com/getkin/kin-openapi v0.117.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/google/wire v0.5.0
+	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/pkg/errors v0.9.1

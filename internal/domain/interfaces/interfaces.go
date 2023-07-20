@@ -6,7 +6,7 @@ import (
 )
 
 type UserAuthorizer interface {
-	AuthByJwt(tokenString string)
+	AuthByJwt(tokenString string) error
 }
 
 type CompaniesRepo interface {

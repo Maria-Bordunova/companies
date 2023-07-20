@@ -147,7 +147,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
           maxLength: 15
@@ -185,6 +184,7 @@ components:
           maxLength: 3000
         employees:
           type: integer
+          format: int64
         registered:
           type: boolean
         type:
@@ -204,6 +204,7 @@ components:
           enum:
             - validation_error
             - company_not_found
+            - unknown_storage_error
 
   parameters:
     paramCompanyUId:

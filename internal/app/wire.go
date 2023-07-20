@@ -8,7 +8,7 @@ import (
 	"companies/internal/domain/interfaces"
 	"companies/internal/infra/http/auth"
 	v1 "companies/internal/infra/http/v1"
-	controller "companies/internal/infra/http/v1/handler"
+	controller "companies/internal/infra/http/v1/controller"
 	"companies/internal/infra/http/v1/middleware"
 	"companies/pkg/logger"
 	"context"

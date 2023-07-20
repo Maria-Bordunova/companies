@@ -11,7 +11,7 @@ import (
 	mongo2 "companies/internal/infra/db/mongo"
 	"companies/internal/infra/http/auth"
 	"companies/internal/infra/http/v1"
-	"companies/internal/infra/http/v1/handler"
+	"companies/internal/infra/http/v1/controller"
 	"companies/internal/infra/http/v1/middleware"
 	"companies/pkg/logger"
 	"context"

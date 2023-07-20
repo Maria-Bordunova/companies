@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"companies/internal/domain/interfaces"
 	"companies/internal/entity"
 	"context"
 	"github.com/pkg/errors"
@@ -9,8 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 )
-
-var ErrStorageNonRetryable = errors.New("non-retryable storage error")
 
 const (
 	db         = "companies"
@@ -30,7 +29,7 @@ func NewCompaniesRepo(mongo *mongo.Client) *CompaniesRepoMongo {
 	}
 }
 
-func (r *CompaniesRepoMongo) Create(ctx context.Context, createParams entity.CreateCompany) (*entity.Company, error) {
+func (r *CompaniesRepoMongo) Create(ctx context.Context, createParams entity.CreateCompany) error {
 	set := bson.D{
 		{"uid", createParams.UId},
 		{"name", createParams.Name},
@@ -49,35 +48,28 @@ func (r *CompaniesRepoMongo) Create(ctx context.Context, createParams entity.Cre
 	}
 
 	if r == nil { // might be nil, as initially the interface method is called
-		return nil, errors.New("companies repo not initialized")
+		return errors.New("companies repo not initialized")
 	}
 	if r.Mongo == nil {
-		return nil, errors.New("companies mongo client not initialized")
+		return errors.New("companies mongo client not initialized")
 	}
 	collection := r.Mongo.Database(db).Collection(companyCol)
 	if collection == nil {
-		return nil, errors.New("company collection not initialized")
+		return errors.New("company collection not initialized")
 	}
 
 	res, err := collection.InsertOne(ctx, doc)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create company")
+		return err
 	}
 	if res.InsertedID == 0 {
-		return nil, ErrStorageNonRetryable // not modified and not inserted somehow
+		return interfaces.ErrStorageNonRetryable // not modified and not inserted somehow
 	}
 
-	return &entity.Company{
-		UId:         createParams.UId,
-		Name:        createParams.Name,
-		Description: createParams.Description,
-		Employees:   createParams.Employees,
-		Registered:  createParams.Registered,
-		Type:        createParams.Type,
-	}, nil
+	return nil
 }
 
-func (r *CompaniesRepoMongo) GetById(ctx context.Context, uid string) (*entity.Company, error) {
+func (r *CompaniesRepoMongo) FetchByUid(ctx context.Context, uid string) (*entity.Company, error) {
 	objID, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid object ID")
@@ -102,16 +94,16 @@ func (r *CompaniesRepoMongo) GetById(ctx context.Context, uid string) (*entity.C
 		if err == mongo.ErrNoDocuments {
 			return nil, nil // Return nil if the company is not found
 		}
-		return nil, errors.Wrap(err, "failed to get company by ID")
+		return nil, err
 	}
 
 	return &company, nil
 }
 
-func (r *CompaniesRepoMongo) UpdateById(ctx context.Context, uid string, updateParams entity.UpdateCompany) error {
+func (r *CompaniesRepoMongo) UpdateByUId(ctx context.Context, uid string, updateParams entity.UpdateCompany) error {
 	objID, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
-		return errors.Wrap(err, "invalid object ID")
+		return err
 	}
 	filter := bson.M{"uid": objID}
 
@@ -154,16 +146,16 @@ func (r *CompaniesRepoMongo) UpdateById(ctx context.Context, uid string, updateP
 		return err
 	}
 	if res.MatchedCount == 0 && res.ModifiedCount == 0 {
-		return ErrStorageNonRetryable // not modified and not inserted somehow
+		return interfaces.ErrStorageNonRetryable // not modified and not inserted somehow
 	}
 
 	return nil
 }
 
-func (r *CompaniesRepoMongo) DeleteById(ctx context.Context, uid string) error {
+func (r *CompaniesRepoMongo) DeleteByUId(ctx context.Context, uid string) error {
 	objID, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
-		return errors.Wrap(err, "invalid object ID")
+		return err
 	}
 
 	filter := bson.M{"uid": objID}
@@ -180,10 +172,10 @@ func (r *CompaniesRepoMongo) DeleteById(ctx context.Context, uid string) error {
 
 	res, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "failed to delete company by ID")
+		return err
 	}
 	if res.DeletedCount == 0 {
-		return ErrStorageNonRetryable // not modified and not inserted somehow
+		return interfaces.ErrStorageNonRetryable // not modified and not inserted somehow
 	}
 
 	return nil

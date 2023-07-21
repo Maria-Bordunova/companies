@@ -1,8 +1,14 @@
 package middleware
 
 import (
+	"companies/internal/ctx"
 	"companies/internal/domain/interfaces"
+	"companies/internal/infra/http/v1/controller"
+	"companies/pkg/gen/oapi"
+	"companies/pkg/logger"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"strings"
@@ -10,53 +16,67 @@ import (
 
 type Registry struct {
 	authByJwt mux.MiddlewareFunc
+	logging   mux.MiddlewareFunc
 }
 
 func (r *Registry) AuthByJwt() mux.MiddlewareFunc {
 	return r.authByJwt
 }
 
-func NewRegistry(authorizer interfaces.UserAuthorizer) *Registry {
-	return &Registry{
-		authByJwt: newAuthByJwt(authorizer),
-	}
-}
-
 func newAuthByJwt(authorizer interfaces.UserAuthorizer) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
 			split := strings.Split(header, "Bearer")
 			if len(split) != 2 {
-				log.Println("failed to authorize project by accessToken: bad authorization header")
-
-				//v1.RespondWithError(w, http.StatusUnauthorized, oapi.Error{
-				//	Code:    v1.ControlUnauthorized,
-				//	Message: "Bad authorization header",
-				//	Type:    oapi.Request,
-				//})
+				log.Println("failed to authorize user by secretToken: bad authorization header")
+				controller.RespondWithError(rw, "bad authorization header", oapi.Unauthorized, http.StatusUnauthorized)
 				return
 			}
-			//secretAccessToken := removeTestPrefix(strings.TrimSpace(split[1]))
-			//
-			//project, err := authorizer.BySecretKey(r.Context(), secretAccessToken)
-			//
-			//if err != nil {
-			//	log.Errorw("failed to authorize project by accessToken", zap.Error(err))
-			//	handleErr(w, err)
-			//	return
-			//}
-			//
-			//if project == nil {
-			//	handleProjectNotFound(w)
-			//	return
-			//}
-			//
-			//r = r.WithContext(
-			//	ctx.WithProject(r.Context(), *project),
-			//)
+			token := strings.TrimSpace(split[1])
+
+			err := authorizer.ByJwt(token)
+			if err != nil {
+				log.Println("failed to authorize user by secretToken", zap.Error(err))
+
+				if errors.Is(err, interfaces.ErrTokenNotValid) {
+					controller.RespondWithError(rw, "Token is not valid error: "+err.Error(), oapi.ForbiddenAccess, http.StatusForbidden)
+					return
+				}
+
+				controller.RespondWithError(rw, "Unknown error occurred while authorization: "+err.Error(), oapi.UnknownAuthError, http.StatusUnauthorized)
+				return
+			}
+
+			next.ServeHTTP(rw, r)
+		})
+	}
+}
+
+func (r *Registry) Logging() mux.MiddlewareFunc {
+	return r.logging
+}
+
+func newLogging(logger *logger.Logger) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log := logger
+			xRequestId := ctx.RequestId(r.Context())
+			if xRequestId != "" {
+				log = logger.With(zap.String("xRequestId", xRequestId))
+			}
+
+			ctx := ctx.WithLogger(r.Context(), log)
+			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
 		})
+	}
+}
+
+func NewRegistry(authorizer interfaces.UserAuthorizer, logger *logger.Logger) *Registry {
+	return &Registry{
+		authByJwt: newAuthByJwt(authorizer),
+		logging:   newLogging(logger),
 	}
 }

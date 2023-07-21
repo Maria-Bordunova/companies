@@ -1,4 +1,4 @@
-package ctx
+package company_ctx
 
 import (
 	"companies/pkg/logger"
@@ -31,7 +31,7 @@ func Logger(ctx context.Context) *logger.Logger {
 	if logger, ok := value(ctx, loggerKey).(*logger.Logger); ok {
 		return logger
 	}
-	log.Printf("no logger in ctx, no-op provided")
+	log.Printf("no logger in company_ctx, no-op provided")
 	return &logger.Logger{SugaredLogger: zap.NewNop().Sugar()}
 }
 

@@ -1,8 +1,8 @@
 package app
 
 import (
+	"companies/internal/company_ctx"
 	"companies/internal/config"
-	"companies/internal/ctx"
 	"context"
 	"net/http"
 	"os/signal"
@@ -11,7 +11,7 @@ import (
 
 func Run(cfg *config.Config) {
 	logger := InitializeLogger(cfg)
-	ctx := ctx.WithLogger(context.Background(), logger)
+	ctx := company_ctx.WithLogger(context.Background(), logger)
 	ctx, _ = signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 
 	mongo := InitializeMongo(ctx, cfg, logger)

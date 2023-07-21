@@ -19,3 +19,7 @@ type CompaniesRepo interface {
 	UpdateByUId(ctx context.Context, uid string, updateParams entity.UpdateCompany) error
 	DeleteByUId(ctx context.Context, uid string) error
 }
+
+type CompanyEventProducer interface {
+	Produce(ctx context.Context, c entity.Company, eventType entity.EventType) error
+}

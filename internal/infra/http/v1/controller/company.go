@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"companies/internal/ctx"
+	"companies/internal/company_ctx"
 	"companies/internal/domain/interfaces"
 	"companies/internal/entity"
 	"companies/pkg/gen/oapi"
@@ -13,7 +13,8 @@ import (
 )
 
 func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request) {
-	log := ctx.Logger(r.Context())
+	ctx := r.Context()
+	log := company_ctx.Logger(ctx)
 
 	params := &oapi.CompanyInput{}
 	decoder := json.NewDecoder(r.Body)
@@ -48,7 +49,7 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 		return
 	}
 
-	createdCompany, err := c.companiesRepo.FetchByUid(r.Context(), company.UId) // TODO move it to domain layer
+	createdCompany, err := c.companiesRepo.FetchByUid(r.Context(), company.UId) // TODO move to domain layer
 	if err != nil {
 		log.
 			With("company uid", company.UId).
@@ -62,12 +63,18 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
 		return
 	}
-
+	err = c.eventProducer.Produce(ctx, *createdCompany, entity.CompanyCreated)
+	if err != nil {
+		log.
+			With("company uid", company.UId).
+			With(zap.Error(err)).
+			Error("error occurred when producing company event")
+	}
 	RespondWithData(rw, convertCompanyToView(*createdCompany))
 }
 
 func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Request) {
-	log := ctx.Logger(r.Context())
+	log := company_ctx.Logger(r.Context())
 
 	uid, err := parseUid(r)
 	if err != nil {
@@ -94,7 +101,7 @@ func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Reques
 }
 
 func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Request) {
-	log := ctx.Logger(r.Context())
+	log := company_ctx.Logger(r.Context())
 
 	uid, err := parseUid(r)
 	if err != nil {
@@ -122,7 +129,7 @@ func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Req
 }
 
 func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Request) {
-	log := ctx.Logger(r.Context())
+	log := company_ctx.Logger(r.Context())
 
 	uid, err := parseUid(r)
 	if err != nil {

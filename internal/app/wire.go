@@ -10,6 +10,7 @@ import (
 	v1 "companies/internal/infra/http/v1"
 	controller "companies/internal/infra/http/v1/controller"
 	"companies/internal/infra/http/v1/middleware"
+	"companies/internal/infra/kafka"
 	"companies/pkg/logger"
 	"context"
 	"github.com/google/wire"
@@ -50,7 +51,9 @@ func InitializeRouter(cfg *config.Config, logger *logger.Logger, mongo *mongo.Cl
 		repoMongo.NewCompaniesRepo,
 
 		// kafka
-
+		wire.Bind(new(interfaces.CompanyEventProducer), new(*kafka.EventProducer)),
+		kafka.NewEventProducer,
+		wire.FieldsOf(&cfg, "Kafka"),
 	))
 
 	return nil

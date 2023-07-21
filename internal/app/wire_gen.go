@@ -13,6 +13,7 @@ import (
 	"companies/internal/infra/http/v1"
 	"companies/internal/infra/http/v1/controller"
 	"companies/internal/infra/http/v1/middleware"
+	"companies/internal/infra/kafka"
 	"companies/pkg/logger"
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,7 +30,9 @@ func InitializeMongo(ctx context.Context, cfg *config.Config, logger2 *logger.Lo
 
 func InitializeRouter(cfg *config.Config, logger2 *logger.Logger, mongo3 *mongo.Client) http.Handler {
 	companiesRepoMongo := mongo2.NewCompaniesRepo(mongo3)
-	controllerController := controller.NewController(companiesRepoMongo)
+	configKafka := cfg.Kafka
+	eventProducer := kafka.NewEventProducer(configKafka)
+	controllerController := controller.NewController(companiesRepoMongo, eventProducer)
 	configAuth := cfg.Auth
 	jwtValidator := auth.NewJwtValidator(configAuth)
 	registry := middleware.NewRegistry(jwtValidator, logger2)

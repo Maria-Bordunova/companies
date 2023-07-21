@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"companies/internal/ctx"
+	"companies/internal/company_ctx"
 	"companies/internal/domain/interfaces"
 	"companies/internal/infra/http/v1/controller"
 	"companies/pkg/gen/oapi"
@@ -61,12 +61,12 @@ func newLogging(logger *logger.Logger) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			log := logger
-			xRequestId := ctx.RequestId(r.Context())
+			xRequestId := company_ctx.RequestId(r.Context())
 			if xRequestId != "" {
 				log = logger.With(zap.String("xRequestId", xRequestId))
 			}
 
-			ctx := ctx.WithLogger(r.Context(), log)
+			ctx := company_ctx.WithLogger(r.Context(), log)
 			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)

@@ -19,7 +19,7 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(params)
 	if err != nil {
-		c.RespondWithError(rw, err.Error(), oapi.ValidationError, http.StatusBadRequest)
+		RespondWithError(rw, err.Error(), oapi.ValidationError, http.StatusBadRequest)
 		return
 	}
 	company := entity.CreateCompany{
@@ -39,11 +39,12 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 			With(zap.Error(err)).
 			Error("error occurred when creating company")
 
-		c.RespondWithError(rw, "Company create error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
-		return
-	}
-	if errors.Is(err, interfaces.ErrStorageNonRetryable) {
-		c.RespondWithError(rw, "Company update error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
+		if errors.Is(err, interfaces.ErrStorageNonRetryable) {
+			RespondWithError(rw, "Company update error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
+			return
+		}
+
+		RespondWithError(rw, "Company create error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
 
@@ -54,15 +55,15 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 			With(zap.Error(err)).
 			Error("error occurred when fetching company by uid")
 
-		c.RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
+		RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
 	if createdCompany == nil {
-		c.RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
+		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
 		return
 	}
 
-	c.RespondWithData(rw, convertCompanyToView(*createdCompany))
+	RespondWithData(rw, convertCompanyToView(*createdCompany))
 }
 
 func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Request) {
@@ -70,7 +71,7 @@ func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Reques
 
 	uid, err := parseUid(r)
 	if err != nil {
-		c.RespondWithError(rw, "Bad params: "+err.Error(), oapi.ValidationError, http.StatusBadRequest)
+		RespondWithError(rw, "Bad params: "+err.Error(), oapi.ValidationError, http.StatusBadRequest)
 		return
 	}
 
@@ -81,15 +82,15 @@ func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Reques
 			With(zap.Error(err)).
 			Error("error occurred when fetching company by uid")
 
-		c.RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
+		RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
 	if company == nil {
-		c.RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusNotFound)
+		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusNotFound)
 		return
 	}
 
-	c.RespondWithData(rw, convertCompanyToView(*company))
+	RespondWithData(rw, convertCompanyToView(*company))
 }
 
 func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Request) {
@@ -97,7 +98,7 @@ func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Req
 
 	uid, err := parseUid(r)
 	if err != nil {
-		c.RespondWithError(rw, "Bad params: "+err.Error(), oapi.ValidationError, http.StatusBadRequest)
+		RespondWithError(rw, "Bad params: "+err.Error(), oapi.ValidationError, http.StatusBadRequest)
 		return
 	}
 
@@ -108,11 +109,12 @@ func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Req
 			With(zap.Error(err)).
 			Error("error occurred when deleting company by uid")
 
-		c.RespondWithError(rw, "Company delete error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
-		return
-	}
-	if errors.Is(err, interfaces.ErrStorageNonRetryable) {
-		c.RespondWithError(rw, "Company delete error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
+		if errors.Is(err, interfaces.ErrStorageNonRetryable) {
+			RespondWithError(rw, "Company delete error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
+			return
+		}
+
+		RespondWithError(rw, "Company delete error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
 
@@ -124,7 +126,7 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 
 	uid, err := parseUid(r)
 	if err != nil {
-		c.RespondWithError(rw, "Bad params: "+err.Error(), oapi.ValidationError, http.StatusBadRequest)
+		RespondWithError(rw, "Bad params: "+err.Error(), oapi.ValidationError, http.StatusBadRequest)
 		return
 	}
 
@@ -132,7 +134,7 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(params)
 	if err != nil {
-		c.RespondWithError(rw, err.Error(), oapi.ValidationError, http.StatusBadRequest)
+		RespondWithError(rw, err.Error(), oapi.ValidationError, http.StatusBadRequest)
 		return
 	}
 	company := entity.UpdateCompany{
@@ -150,14 +152,14 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 			With(zap.Error(err)).
 			Error("error occurred when updating company by uid")
 
-		c.RespondWithError(rw, "Company update error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
-		return
-	}
-	if errors.Is(err, interfaces.ErrStorageNonRetryable) {
-		c.RespondWithError(rw, "Company update error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
-		return
-	}
+		if errors.Is(err, interfaces.ErrStorageNonRetryable) {
+			RespondWithError(rw, "Company update error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
+			return
+		}
 
+		RespondWithError(rw, "Company update error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
+		return
+	}
 	updatedCompany, err := c.companiesRepo.FetchByUid(r.Context(), uid) // TODO move it to domain layer
 	if err != nil {
 		log.
@@ -165,15 +167,15 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 			With(zap.Error(err)).
 			Error("error occurred when fetching company by uid")
 
-		c.RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
+		RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
 	if updatedCompany == nil {
-		c.RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusNotFound)
+		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusNotFound)
 		return
 	}
 
-	c.RespondWithData(rw, convertCompanyToView(*updatedCompany))
+	RespondWithData(rw, convertCompanyToView(*updatedCompany))
 }
 
 func parseUid(r *http.Request) (string, error) {

@@ -6,15 +6,15 @@ import (
 	"net/http"
 )
 
-func (c Controller) RespondWithData(rw http.ResponseWriter, response interface{}) {
-	c.RespondWithDataAndCode(rw, response, http.StatusOK)
+func RespondWithData(rw http.ResponseWriter, response interface{}) {
+	RespondWithDataAndCode(rw, response, http.StatusOK)
 }
 
-func (c Controller) RespondWithError(rw http.ResponseWriter, errMsg string, errCode oapi.ErrorCode, statusCode int) {
-	c.RespondWithDataAndCode(rw, oapi.Error{Error: errMsg, Code: errCode}, statusCode)
+func RespondWithError(rw http.ResponseWriter, errMsg string, errCode oapi.ErrorCode, statusCode int) {
+	RespondWithDataAndCode(rw, oapi.Error{Error: errMsg, Code: errCode}, statusCode)
 }
 
-func (c Controller) RespondWithDataAndCode(rw http.ResponseWriter, response interface{}, code int) {
+func RespondWithDataAndCode(rw http.ResponseWriter, response interface{}, code int) {
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(code)
 	json.NewEncoder(rw).Encode(response)

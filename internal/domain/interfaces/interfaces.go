@@ -7,9 +7,10 @@ import (
 )
 
 var ErrStorageNonRetryable = errors.New("non-retryable storage error")
+var ErrTokenNotValid = errors.New("token is not valid")
 
 type UserAuthorizer interface {
-	AuthByJwt(tokenString string) error
+	ByJwt(tokenString string) error
 }
 
 type CompaniesRepo interface {

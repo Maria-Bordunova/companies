@@ -9,6 +9,7 @@ services:
       - "7150:80"
     environment:
       MONGO_DSN: mongodb://root:example@mongo:27017/
+      JWT_SECRET_KEY: qwertyuiopasdfghjklzxcvbnm123456
     depends_on:
       mongo:
         condition: service_started

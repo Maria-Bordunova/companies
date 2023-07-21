@@ -6,7 +6,7 @@ import (
 )
 
 type Auth struct {
-	JwtSecretToken string `env:"JWT_SECRET_KEY" default:"jwt_secret_key"`
+	JwtKey string `env:"JWT_SECRET_KEY" default:"jwt_secret_key"`
 }
 
 type Config struct {

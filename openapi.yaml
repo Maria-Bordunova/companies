@@ -202,7 +202,9 @@ components:
           type: string
           description: Error code
           enum:
+            - unknown_auth_error
             - unauthorized
+            - forbidden_access
             - validation_error
             - company_not_found
             - unknown_storage_error

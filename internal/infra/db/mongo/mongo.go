@@ -23,7 +23,7 @@ func connect(ctx context.Context, config Config, logger *logger.Logger) *mongo.C
 		return nil
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Dsn))
 	if err != nil {

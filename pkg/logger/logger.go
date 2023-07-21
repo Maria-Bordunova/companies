@@ -88,3 +88,10 @@ func (l *Logger) InvalidArgValue(arg string, val string) {
 func (l *Logger) MissingArg(arg string) {
 	l.SugaredLogger.Errorf(missingArgMessage.message, arg)
 }
+
+// With wraps the same function of SugaredLogger
+func (l *Logger) With(args ...interface{}) *Logger {
+	return &Logger{
+		SugaredLogger: l.SugaredLogger.With(args...),
+	}
+}

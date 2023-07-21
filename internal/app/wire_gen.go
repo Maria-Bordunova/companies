@@ -32,7 +32,7 @@ func InitializeRouter(cfg *config.Config, logger2 *logger.Logger, mongo3 *mongo.
 	controllerController := controller.NewController(companiesRepoMongo)
 	configAuth := cfg.Auth
 	jwtValidator := auth.NewJwtValidator(configAuth)
-	registry := middleware.NewRegistry(jwtValidator)
+	registry := middleware.NewRegistry(jwtValidator, logger2)
 	handler := v1.NewRouter(controllerController, registry)
 	return handler
 }

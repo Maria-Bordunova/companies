@@ -3,7 +3,7 @@ package kafka
 import (
 	"companies/internal/company_ctx"
 	"companies/internal/config"
-	"companies/internal/entity"
+	"companies/internal/entity/event"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,17 +11,12 @@ import (
 )
 
 type MessageBody struct {
-	MessageType entity.EventType `json:"message_type"`
-	Payload     payload          `json:"payload"`
+	MessageType event.EventType `json:"message_type"`
+	Payload     payload         `json:"payload"`
 }
 
 type payload struct {
-	UId         string  `json:"uid"`
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
-	Employees   int64   `json:"employees"`
-	Registered  bool    `json:"registered"`
-	Type        string  `json:"type"`
+	UId string `json:"uid"`
 }
 
 type EventProducer struct {
@@ -32,7 +27,7 @@ func NewEventProducer(config config.Kafka) *EventProducer {
 	return &EventProducer{config: config}
 }
 
-func (o *EventProducer) Produce(ctx context.Context, c entity.Company, eventType entity.EventType) error {
+func (o *EventProducer) Produce(ctx context.Context, uid string, eventType event.EventType) error {
 	sConfig := sarama.NewConfig()
 
 	sConfig.Producer.Return.Successes = true
@@ -46,12 +41,7 @@ func (o *EventProducer) Produce(ctx context.Context, c entity.Company, eventType
 	messageBody := MessageBody{
 		MessageType: eventType,
 		Payload: payload{
-			UId:         c.UId,
-			Name:        c.Name,
-			Description: c.Description,
-			Employees:   c.Employees,
-			Registered:  c.Registered,
-			Type:        string(c.Type),
+			UId: uid,
 		},
 	}
 	messageBodyJson, err := jsonToMsg(messageBody)

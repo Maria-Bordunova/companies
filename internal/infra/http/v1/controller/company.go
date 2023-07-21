@@ -4,6 +4,7 @@ import (
 	"companies/internal/company_ctx"
 	"companies/internal/domain/interfaces"
 	"companies/internal/entity"
+	"companies/internal/entity/event"
 	"companies/pkg/gen/oapi"
 	"encoding/json"
 	"github.com/gorilla/mux"
@@ -63,7 +64,7 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
 		return
 	}
-	err = c.eventProducer.Produce(ctx, *createdCompany, entity.CompanyCreated)
+	err = c.eventProducer.Produce(ctx, createdCompany.UId, event.CompanyCreated)
 	if err != nil {
 		log.
 			With("company uid", company.UId).
@@ -101,7 +102,8 @@ func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Reques
 }
 
 func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Request) {
-	log := company_ctx.Logger(r.Context())
+	ctx := r.Context()
+	log := company_ctx.Logger(ctx)
 
 	uid, err := parseUid(r)
 	if err != nil {
@@ -124,12 +126,20 @@ func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Req
 		RespondWithError(rw, "Company delete error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
+	err = c.eventProducer.Produce(ctx, uid, event.CompanyDeleted)
+	if err != nil {
+		log.
+			With("company uid", uid).
+			With(zap.Error(err)).
+			Error("error occurred when producing company event")
+	}
 
 	c.RespondWithCode(rw, http.StatusNoContent)
 }
 
 func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Request) {
-	log := company_ctx.Logger(r.Context())
+	ctx := r.Context()
+	log := company_ctx.Logger(ctx)
 
 	uid, err := parseUid(r)
 	if err != nil {
@@ -180,6 +190,14 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 	if updatedCompany == nil {
 		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusNotFound)
 		return
+	}
+
+	err = c.eventProducer.Produce(ctx, uid, event.CompanyUpdated)
+	if err != nil {
+		log.
+			With("company uid", uid).
+			With(zap.Error(err)).
+			Error("error occurred when producing company event")
 	}
 
 	RespondWithData(rw, convertCompanyToView(*updatedCompany))

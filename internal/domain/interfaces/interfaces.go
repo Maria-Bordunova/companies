@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"companies/internal/entity"
+	"companies/internal/entity/event"
 	"context"
 	"github.com/pkg/errors"
 )
@@ -21,5 +22,5 @@ type CompaniesRepo interface {
 }
 
 type CompanyEventProducer interface {
-	Produce(ctx context.Context, c entity.Company, eventType entity.EventType) error
+	Produce(ctx context.Context, uid string, eventType event.EventType) error
 }

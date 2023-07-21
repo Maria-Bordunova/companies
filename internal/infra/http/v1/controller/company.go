@@ -12,6 +12,59 @@ import (
 	"net/http"
 )
 
+func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request) {
+	log := ctx.Logger(r.Context())
+
+	params := &oapi.CompanyInput{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(params)
+	if err != nil {
+		c.RespondWithError(rw, err.Error(), oapi.ValidationError, http.StatusBadRequest)
+		return
+	}
+	company := entity.CreateCompany{
+		UId:         params.Id,
+		Name:        params.Name,
+		Description: params.Description,
+		Employees:   params.Employees,
+		Registered:  params.Registered,
+		Type:        (entity.CompanyType)(params.Type), // TODO better implementation with strict check
+	}
+
+	err = c.companiesRepo.Create(r.Context(), company)
+	if err != nil {
+		log.
+			With("company uid", company.UId).
+			With("company name", company.Name).
+			With(zap.Error(err)).
+			Error("error occurred when creating company")
+
+		c.RespondWithError(rw, "Company create error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
+		return
+	}
+	if errors.Is(err, interfaces.ErrStorageNonRetryable) {
+		c.RespondWithError(rw, "Company update error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
+		return
+	}
+
+	createdCompany, err := c.companiesRepo.FetchByUid(r.Context(), company.UId) // TODO move it to domain layer
+	if err != nil {
+		log.
+			With("company uid", company.UId).
+			With(zap.Error(err)).
+			Error("error occurred when fetching company by uid")
+
+		c.RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
+		return
+	}
+	if createdCompany == nil {
+		c.RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
+		return
+	}
+
+	c.RespondWithData(rw, convertCompanyToView(*createdCompany))
+}
+
 func (c *Controller) HandleCompanyGetById(rw http.ResponseWriter, r *http.Request) {
 	log := ctx.Logger(r.Context())
 
@@ -121,58 +174,6 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 	}
 
 	c.RespondWithData(rw, convertCompanyToView(*updatedCompany))
-}
-
-func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request) {
-	log := ctx.Logger(r.Context())
-
-	params := &oapi.CompanyInput{}
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(params)
-	if err != nil {
-		c.RespondWithError(rw, err.Error(), oapi.ValidationError, http.StatusBadRequest)
-		return
-	}
-	company := entity.CreateCompany{
-		Name:        params.Name,
-		Description: params.Description,
-		Employees:   params.Employees,
-		Registered:  params.Registered,
-		Type:        (entity.CompanyType)(params.Type), // TODO better implementation with strict check
-	}
-
-	err = c.companiesRepo.Create(r.Context(), company)
-	if err != nil {
-		log.
-			With("company uid", company.UId).
-			With("company name", company.Name).
-			With(zap.Error(err)).
-			Error("error occurred when creating company")
-
-		c.RespondWithError(rw, "Company create error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
-		return
-	}
-	if errors.Is(err, interfaces.ErrStorageNonRetryable) {
-		c.RespondWithError(rw, "Company update error: "+err.Error(), oapi.CompanyNotFound, http.StatusNotFound)
-		return
-	}
-
-	createdCompany, err := c.companiesRepo.FetchByUid(r.Context(), company.UId) // TODO move it to domain layer
-	if err != nil {
-		log.
-			With("company uid", company.UId).
-			With(zap.Error(err)).
-			Error("error occurred when fetching company by uid")
-
-		c.RespondWithError(rw, "Company fetch error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
-		return
-	}
-	if createdCompany == nil {
-		c.RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
-		return
-	}
-
-	c.RespondWithData(rw, convertCompanyToView(*createdCompany))
 }
 
 func parseUid(r *http.Request) (string, error) {

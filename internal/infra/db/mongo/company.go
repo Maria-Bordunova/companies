@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -58,11 +59,12 @@ func (r *CompaniesRepoMongo) Create(ctx context.Context, createParams entity.Cre
 		return errors.New("company collection not initialized")
 	}
 
-	res, err := collection.InsertOne(ctx, doc)
+	filter := bson.D{{"uid", createParams.UId}}
+	res, err := collection.UpdateOne(ctx, filter, doc, options.Update().SetUpsert(true))
 	if err != nil {
 		return err
 	}
-	if res.InsertedID == 0 {
+	if res.MatchedCount == 0 && res.UpsertedCount == 0 {
 		return interfaces.ErrStorageNonRetryable // not modified and not inserted somehow
 	}
 
@@ -70,12 +72,7 @@ func (r *CompaniesRepoMongo) Create(ctx context.Context, createParams entity.Cre
 }
 
 func (r *CompaniesRepoMongo) FetchByUid(ctx context.Context, uid string) (*entity.Company, error) {
-	objID, err := primitive.ObjectIDFromHex(uid)
-	if err != nil {
-		return nil, errors.Wrap(err, "invalid object ID")
-	}
-
-	filter := bson.M{"uid": objID}
+	filter := bson.M{"uid": uid}
 
 	var company entity.Company
 	if r == nil { // might be nil, as initially the interface method is called
@@ -88,8 +85,7 @@ func (r *CompaniesRepoMongo) FetchByUid(ctx context.Context, uid string) (*entit
 	if collection == nil {
 		return nil, errors.New("company collection not initialized")
 	}
-
-	err = collection.FindOne(ctx, filter).Decode(&company)
+	err := collection.FindOne(ctx, filter).Decode(&company)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil // Return nil if the company is not found
@@ -101,11 +97,7 @@ func (r *CompaniesRepoMongo) FetchByUid(ctx context.Context, uid string) (*entit
 }
 
 func (r *CompaniesRepoMongo) UpdateByUId(ctx context.Context, uid string, updateParams entity.UpdateCompany) error {
-	objID, err := primitive.ObjectIDFromHex(uid)
-	if err != nil {
-		return err
-	}
-	filter := bson.M{"uid": objID}
+	filter := bson.M{"uid": uid}
 
 	set := bson.D{}
 
@@ -153,12 +145,7 @@ func (r *CompaniesRepoMongo) UpdateByUId(ctx context.Context, uid string, update
 }
 
 func (r *CompaniesRepoMongo) DeleteByUId(ctx context.Context, uid string) error {
-	objID, err := primitive.ObjectIDFromHex(uid)
-	if err != nil {
-		return err
-	}
-
-	filter := bson.M{"uid": objID}
+	filter := bson.M{"uid": uid}
 	if r == nil { // might be nil, as initially the interface method is called
 		return errors.New("companies repo not initialized")
 	}

@@ -64,7 +64,7 @@ func (c *Controller) HandleCompanyCreate(rw http.ResponseWriter, r *http.Request
 		RespondWithError(rw, "Company not found", oapi.CompanyNotFound, http.StatusInternalServerError)
 		return
 	}
-	err = c.eventProducer.Produce(ctx, createdCompany.UId, event.CompanyCreated)
+	err = c.eventProducer.Produce(ctx, createdCompany.UId, event.CompanyCreated) // TODO use pub/sub
 	if err != nil {
 		log.
 			With("company uid", company.UId).
@@ -126,7 +126,7 @@ func (c *Controller) HandleCompanyDeleteById(rw http.ResponseWriter, r *http.Req
 		RespondWithError(rw, "Company delete error: "+err.Error(), oapi.UnknownStorageError, http.StatusInternalServerError)
 		return
 	}
-	err = c.eventProducer.Produce(ctx, uid, event.CompanyDeleted)
+	err = c.eventProducer.Produce(ctx, uid, event.CompanyDeleted) // TODO use pub/sub
 	if err != nil {
 		log.
 			With("company uid", uid).
@@ -192,7 +192,7 @@ func (c *Controller) HandleCompanyUpdateById(rw http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = c.eventProducer.Produce(ctx, uid, event.CompanyUpdated)
+	err = c.eventProducer.Produce(ctx, uid, event.CompanyUpdated) // TODO use pub/sub
 	if err != nil {
 		log.
 			With("company uid", uid).

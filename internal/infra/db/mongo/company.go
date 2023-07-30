@@ -60,6 +60,8 @@ func (r *CompaniesRepoMongo) Create(ctx context.Context, createParams entity.Cre
 	}
 
 	filter := bson.D{{"uid", createParams.UId}}
+	// TODO handle already exist
+	// TODO now it will upsert existing value. It is possible to make it more strict
 	res, err := collection.UpdateOne(ctx, filter, doc, options.Update().SetUpsert(true))
 	if err != nil {
 		return err

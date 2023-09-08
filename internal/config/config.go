@@ -4,9 +4,9 @@ import (
 	"github.com/jinzhu/configor"
 )
 
-const appEnvPrefix = "Q"
+const appEnvPrefix = "C"
 
-func InitConfigorConfig() (*Config, error) {
+func InitConfig() (*Config, error) {
 	var cfg = &Config{}
 
 	err := configor.

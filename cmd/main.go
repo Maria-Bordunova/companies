@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	conf, err := config.InitConfigorConfig()
+	conf, err := config.InitConfig()
 	if err != nil {
 		log.Println("Config init failed")
 
